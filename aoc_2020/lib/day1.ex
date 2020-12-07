@@ -243,4 +243,20 @@ defmodule Day1 do
       end)
     end)
   end
+
+  def three_expense_report_entries_equal_to_2020 do
+    Enum.each(@expense_report, fn x ->
+      Enum.reduce(@expense_report, x, fn
+        num, acc ->
+          remainder = rem(2020, num + acc)
+
+          if Enum.member?(@expense_report, remainder) and remainder != num and remainder != acc do
+            num &&
+              IO.puts("numbers: #{num}, #{acc}, #{remainder}, product: #{num * acc * remainder}")
+          else
+            acc
+          end
+      end)
+    end)
+  end
 end
