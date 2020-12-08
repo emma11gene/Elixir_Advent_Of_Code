@@ -29,7 +29,20 @@ defmodule Day2 do
   """
 
   @doc """
-  iex> IO.puts("Hello")
-  "Hello"
+  iex> Day2.say_hello()
+  "Nope"
   """
+  def say_hello do
+    IO.puts("hello")
+  end
+
+  def read_file do
+    File.read!("source_files/day_2_passwords.ex")
+  end
+
+  def convert_passwords_to_map(password_input) do
+    password_input
+    |> String.split("\n")
+    |> IO.puts()
+  end
 end
