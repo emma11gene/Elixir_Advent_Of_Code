@@ -1,17 +1,28 @@
-defmodule Day2 do
+defmodule Day1 do
   @moduledoc """
-  Documentation for Day2.
+  Documentation for Day1.
   """
 
   @doc """
-  day 2 of AOC:
-  The Elves in accounting are thankful for your help; one of them even offers you a starfish coin they had left over from a past vacation. They offer you a second one if you can find three numbers in your expense report that meet the same criteria.
+  day 1 of AOC:
+  Before you leave, the Elves in accounting just need you to fix your expense report (your puzzle input); apparently, something isn't quite adding up.
 
-  Using the above example again, the three entries that sum to 2020 are 979, 366, and 675. Multiplying them together produces the answer, 241861950.
+  Specifically, they need you to find the two entries that sum to 2020 and then multiply those two numbers together.
 
-  In your expense report, what is the product of the three entries that sum to 2020?
+  For example, suppose your expense report contained the following:
+
+  1721
+  979
+  366
+  299
+  675
+  1456
+  In this list, the two entries that sum to 2020 are 1721 and 299. Multiplying them together produces 1721 * 299 = 514579, so the correct answer is 514579.
+
+  Of course, your expense report is much larger. Find the two entries that sum to 2020; what do you get if you multiply them together?
 
   """
+
   @expense_report [
     1706,
     1466,
@@ -217,6 +228,20 @@ defmodule Day2 do
 
   def get_expense_report do
     @expense_report
+  end
+
+  def expense_report_entry_sum_equal_2020 do
+    # maybe should do this as a Enum.reduce_while
+    Enum.each(@expense_report, fn x ->
+      Enum.reduce(@expense_report, x, fn
+        num, acc ->
+          if num + acc == 2020 do
+            num && IO.inspect(num * acc)
+          else
+            acc
+          end
+      end)
+    end)
   end
 
   def three_expense_report_entries_equal_to_2020 do
