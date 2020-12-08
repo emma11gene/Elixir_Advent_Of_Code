@@ -66,29 +66,6 @@ defmodule Day2 do
   #   |> IO.inspect()
   # end
 
-  @doc """
-  iex> Day2.convert_password_and_policy_to_map(#{inspect(@test_source)})
-   ...>       [
-   ...>           %{
-   ...>             "max" => "3",
-   ...>             "min" => "1",
-   ...>             "password" => "abcde",
-   ...>             "policy" => "a"
-   ...>           },
-   ...>           %{
-   ...>             "max" => "3",
-   ...>             "min" => "1",
-   ...>             "password" => "cdefg",
-   ...>             "policy" => "b"
-   ...>           },
-   ...>           %{
-   ...>             "max" => "9",
-   ...>             "min" => "2",
-   ...>             "password" => "ccccccccc",
-   ...>             "policy" => "c"
-   ...>           }
-   ...>         ]
-  """
   def convert_password_and_policy_to_map(password_input) do
     password_input
     |> String.split("\n", trim: true)
