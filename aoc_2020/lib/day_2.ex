@@ -30,19 +30,107 @@ defmodule Day2 do
 
   @doc """
   iex> Day2.say_hello()
-  "Nope"
+  "hello"
   """
   def say_hello do
-    IO.puts("hello")
+    IO.inspect("hello")
   end
 
   def read_file do
     File.read!("source_files/day_2_passwords.ex")
   end
 
-  def convert_passwords_to_map(password_input) do
+  # def convert_password_and_policy_to_map(password_input) do
+  #   password_input
+  #   |> String.split("\n", trim: true)
+  #   |> Enum.map(fn password_policy ->
+  #     password_policy_map =
+  #       Regex.named_captures(
+  #         ~r/^(?<min>[\d]+)-(?<max>[\d]+)\s(?<policy>[a-z]):\s(?<password>[a-z]+)/,
+  #         password_policy
+  #       )
+
+  #     count_of_required_char_in_password =
+  #       String.graphemes(password_policy_map["password"])
+  #       |> Enum.count(&(&1 == password_policy_map["policy"]))
+
+  #     if(
+  #       count_of_required_char_in_password >= String.to_integer(password_policy_map["min"]) and
+  #         count_of_required_char_in_password <= String.to_integer(password_policy_map["max"])
+  #     ) do
+  #       nil
+  #     else
+  #       password_policy_map["password"]
+  #     end
+  #   end)
+  #   |> IO.inspect()
+  # end
+
+  @doc """
+  iex> Day2.convert_password_and_policy_to_map(#{inspect(@test_source)})
+   ...>       [
+   ...>           %{
+   ...>             "max" => "3",
+   ...>             "min" => "1",
+   ...>             "password" => "abcde",
+   ...>             "policy" => "a"
+   ...>           },
+   ...>           %{
+   ...>             "max" => "3",
+   ...>             "min" => "1",
+   ...>             "password" => "cdefg",
+   ...>             "policy" => "b"
+   ...>           },
+   ...>           %{
+   ...>             "max" => "9",
+   ...>             "min" => "2",
+   ...>             "password" => "ccccccccc",
+   ...>             "policy" => "c"
+   ...>           }
+   ...>         ]
+  """
+  def convert_password_and_policy_to_map(password_input) do
     password_input
-    |> String.split("\n")
-    |> IO.puts()
+    |> String.split("\n", trim: true)
+    |> Enum.map(fn password_policy ->
+      Regex.named_captures(
+        ~r/^(?<min>[\d]+)-(?<max>[\d]+)\s(?<policy>[a-z]):\s(?<password>[a-z]+)/,
+        password_policy
+      )
+    end)
+  end
+
+  @doc """
+  iex> Day2.get_invalid_passwords([%{"max" => "2", "min" => "1", "password" => "lmrr", "policy" => "r"}, %{"max" => "2", "min" => "1", "password" => "lmrrr", "policy" => "r"}])
+  ["lmrrr"]
+  """
+  def get_invalid_passwords(pass_policy_map) do
+    pass_policy_map
+    |> Enum.map(fn pass_policy ->
+      count_of_policy_chars_in_pass =
+        String.graphemes(pass_policy["password"])
+        |> Enum.count(&(&1 == pass_policy["policy"]))
+
+      if(
+        count_of_policy_chars_in_pass < String.to_integer(pass_policy["min"]) or
+          count_of_policy_chars_in_pass > String.to_integer(pass_policy["max"])
+      ) do
+        pass_policy["password"]
+      end
+    end)
+  end
+
+  def count_of_invalid_passwords(invalid_passwords) do
+    invalid_passwords
+    |> IO.inspect()
+  end
+
+  def run do
+    read_file()
+    |> convert_password_and_policy_to_map()
+    |> IO.inspect()
+
+    # |> get_invalid_passwords()
+    # |> count_of_invalid_passwords()
   end
 end
