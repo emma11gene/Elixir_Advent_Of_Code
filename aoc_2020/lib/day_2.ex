@@ -2,6 +2,7 @@ defmodule Day2 do
   @moduledoc """
   Documentation for Day2
     day 2 of AOC:
+    par1
   Your flight departs in a few days from the coastal airport; the easiest way down to the coast from here is via toboggan.
 
   The shopkeeper at the North Pole Toboggan Rental Shop is having a bad day. "Something's wrong with our computers; we can't log in!" You ask if you can take a look.
@@ -20,94 +21,83 @@ defmodule Day2 do
   In the above example, 2 passwords are valid. The middle password, cdefg, is not; it contains no instances of b, but needs at least 1. The first and third passwords are valid: they contain one a or nine c, both within the limits of their respective policies.
 
   How many passwords are valid according to their policies?
-  """
+  part2
+  While it appears you validated the passwords correctly, they don't seem to be what the Official Toboggan Corporate Authentication System is expecting.
 
-  @test_source """
-  1-3 a: abcde
-  1-3 b: cdefg
-  2-9 c: ccccccccc
-  """
+  The shopkeeper suddenly realizes that he just accidentally explained the password policy rules from his old job at the sled rental place down the street! The Official Toboggan Corporate Policy actually works a little differently.
 
-  @doc """
-  iex> Day2.say_hello()
-  "hello"
+  Each policy actually describes two positions in the password, where 1 means the first character, 2 means the second character, and so on. (Be careful; Toboggan Corporate Policies have no concept of "index zero"!) Exactly one of these positions must contain the given letter. Other occurrences of the letter are irrelevant for the purposes of policy enforcement.
+
+  Given the same example list from above:
+
+  1-3 a: abcde is valid: position 1 contains a and position 3 does not.
+  1-3 b: cdefg is invalid: neither position 1 nor position 3 contains b.
+  2-9 c: ccccccccc is invalid: both position 2 and position 9 contain c.
+  How many passwords are valid according to the new interpretation of the policies?
   """
-  def say_hello do
-    IO.inspect("hello")
-  end
 
   def read_file do
     File.read!("source_files/day_2_passwords.ex")
   end
 
-  # def convert_password_and_policy_to_map(password_input) do
-  #   password_input
-  #   |> String.split("\n", trim: true)
-  #   |> Enum.map(fn password_policy ->
-  #     password_policy_map =
-  #       Regex.named_captures(
-  #         ~r/^(?<min>[\d]+)-(?<max>[\d]+)\s(?<policy>[a-z]):\s(?<password>[a-z]+)/,
-  #         password_policy
-  #       )
-
-  #     count_of_required_char_in_password =
-  #       String.graphemes(password_policy_map["password"])
-  #       |> Enum.count(&(&1 == password_policy_map["policy"]))
-
-  #     if(
-  #       count_of_required_char_in_password >= String.to_integer(password_policy_map["min"]) and
-  #         count_of_required_char_in_password <= String.to_integer(password_policy_map["max"])
-  #     ) do
-  #       nil
-  #     else
-  #       password_policy_map["password"]
-  #     end
-  #   end)
-  #   |> IO.inspect()
-  # end
-
-  def convert_password_and_policy_to_map(password_input) do
+  def convert_input_to_map(password_input) do
     password_input
     |> String.split("\n", trim: true)
     |> Enum.map(fn password_policy ->
       Regex.named_captures(
-        ~r/^(?<min>[\d]+)-(?<max>[\d]+)\s(?<policy>[a-z]):\s(?<password>[a-z]+)/,
+        ~r/^(?<policy_arg_1>[\d]+)-(?<policy_arg_2>[\d]+)\s(?<policy>[a-z]):\s(?<password>[a-z]+)/,
         password_policy
       )
     end)
   end
 
   @doc """
-  iex> Day2.get_invalid_passwords([%{"max" => "2", "min" => "1", "password" => "lmrr", "policy" => "r"}, %{"max" => "2", "min" => "1", "password" => "lmrrr", "policy" => "r"}])
+  iex> Day2.get_valid_passwords([%{"policy_arg_2" => "2", "policy_arg_1" => "1", "password" => "lmrr", "policy" => "r"}, %{"policy_arg_2" => "2", "policy_arg_1" => "1", "password" => "lmrrr", "policy" => "r"}])
   ["lmrrr"]
   """
-  def get_invalid_passwords(pass_policy_map) do
+  def get_valid_passwords_part_1(pass_policy_map) do
     pass_policy_map
-    |> Enum.map(fn pass_policy ->
+    |> Enum.filter(fn pass_policy ->
       count_of_policy_chars_in_pass =
         String.graphemes(pass_policy["password"])
         |> Enum.count(&(&1 == pass_policy["policy"]))
 
-      if(
-        count_of_policy_chars_in_pass < String.to_integer(pass_policy["min"]) or
-          count_of_policy_chars_in_pass > String.to_integer(pass_policy["max"])
-      ) do
-        pass_policy["password"]
-      end
+      count_of_policy_chars_in_pass >= String.to_integer(pass_policy["policy_arg_1"]) and
+        count_of_policy_chars_in_pass <= String.to_integer(pass_policy["policy_arg_2"])
     end)
   end
 
-  def count_of_invalid_passwords(invalid_passwords) do
-    invalid_passwords
-    |> IO.inspect()
+  def get_valid_passwords_part_2(pass_policy_map) do
+    pass_policy_map
+    |> Enum.filter(fn pass_policy ->
+      position_1 = String.to_integer(pass_policy["policy_arg_1"]) - 1
+      position_2 = String.to_integer(pass_policy["policy_arg_2"]) - 1
+      password = pass_policy["password"]
+      policy_char = pass_policy["policy"]
+
+      (String.at(password, position_1) == policy_char and
+         String.at(password, position_2) != policy_char) or
+        (String.at(password, position_2) ==
+           policy_char and String.at(password, position_1) != policy_char)
+    end)
   end
 
-  def run do
-    read_file()
-    |> convert_password_and_policy_to_map()
-    |> IO.inspect()
+  def count_of_valid_passwords(invalid_passwords) do
+    invalid_passwords
+    |> Enum.count()
+  end
 
-    # |> get_invalid_passwords()
-    # |> count_of_invalid_passwords()
+  def run_part1_solution do
+    read_file()
+    |> convert_input_to_map()
+    |> get_valid_passwords_part_1()
+    |> count_of_valid_passwords()
+  end
+
+  def run_part2_solution do
+    read_file()
+    |> convert_input_to_map()
+    |> get_valid_passwords_part_2()
+    |> count_of_valid_passwords()
   end
 end

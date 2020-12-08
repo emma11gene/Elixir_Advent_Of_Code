@@ -233,6 +233,7 @@ defmodule Day1 do
   def expense_report_entry_sum_equal_2020 do
     # maybe should do this as a Enum.reduce_while
     Enum.each(@expense_report, fn x ->
+      # TODO: change to filter
       Enum.reduce(@expense_report, x, fn
         num, acc ->
           if num + acc == 2020 do
